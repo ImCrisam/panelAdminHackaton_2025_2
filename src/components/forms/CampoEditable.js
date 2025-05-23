@@ -4,7 +4,6 @@ import {
   CFormTextarea,
   CFormLabel,
   CFormCheck,
-  CFormGroup
 } from '@coreui/react';
 
 export const CampoEditable = ({ campo }) => {

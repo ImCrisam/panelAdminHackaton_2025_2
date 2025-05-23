@@ -2,8 +2,7 @@ import React from 'react'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const PanelActualizacion = React.lazy(() => import('./components/forms/PanelActualizacion'))
-
-
+const PanelDisponibilidad = React.lazy(() => import('./components/salones/PanelDisponibilidad .js'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
 
@@ -54,10 +53,15 @@ const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
 
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
-  { path: '/panel', name: 'Panel de Actualización', element: PanelActualizacion },
+  { path: '/infoWeb', name: 'Panel de Actualización', element: PanelActualizacion },
+  { path: '/Disponibilidad', name: 'Disponibilidad', element: PanelDisponibilidad },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
+
+
+  
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
   { path: '/theme/typography', name: 'Typography', element: Typography },
