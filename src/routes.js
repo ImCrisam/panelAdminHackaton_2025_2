@@ -61,6 +61,7 @@ const routes = [
   { path: '/infoWeb', name: 'Panel de Actualización', element: PanelActualizacion },
   { path: '/Disponibilidad', name: 'Disponibilidad', element: PanelDisponibilidad },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
+  { path: '/ComoUsar', name: 'ComoUsar', element: Dashboard },
 
 
   

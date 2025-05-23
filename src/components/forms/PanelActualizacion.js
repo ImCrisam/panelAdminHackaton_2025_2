@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { ListaCampos } from './ListaCampos';
-import { CampoEditable } from './CampoEditable';
 import {
   CCard,
   CCardBody,
@@ -10,17 +8,13 @@ import {
   CFormLabel,
   CFormInput,
   CButton,
-} from '@coreui/react';
-
-import panelData from './camposUpdate.json';
-const panelInfoWeb = panelData.panel;
+  CFormTextarea,
+} from '@coreui/react'
 
 const PanelActualizacion = () => {
-
-    const [panelInfoWeb, setPanelInfoWeb] = useState(null)
+  const [panelInfoWeb, setPanelInfoWeb] = useState(null)
   const [formData, setFormData] = useState({})
 
-  // Simula un fetch para traer los datos iniciales
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -29,15 +23,20 @@ const PanelActualizacion = () => {
         const data = await response.json()
         setPanelInfoWeb(data)
 
-        // Inicializa formData con valores recibidos
         const initialData = {}
         data.campos.forEach((campo) => {
-          initialData[campo.label] = campo.valor || ''
+          if (campo.tipo === 'lista' && Array.isArray(campo.campos)) {
+            initialData[campo.nombre] = {}
+            campo.campos.forEach((sub) => {
+              initialData[campo.nombre][sub.nombre] = sub.valor ?? ''
+            })
+          } else {
+            initialData[campo.nombre] = campo.valor ?? ''
+          }
         })
         setFormData(initialData)
       } catch (error) {
         console.error('Fetch error:', error)
-        // En caso de error, podrías inicializar con un objeto vacío o datos por defecto
         setPanelInfoWeb({ campos: [] })
         setFormData({})
       }
@@ -46,18 +45,23 @@ const PanelActualizacion = () => {
     fetchData()
   }, [])
 
-  // Si no hay panelInfoWeb, mostrar algo (spinner, mensaje, etc.)
-  if (!panelInfoWeb) return <p>Cargando datos...</p>
-
-  // Maneja cambios de inputs
-  const handleChange = (label, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [label]: value,
-    }))
+  const handleChange = (campoNombre, value, subCampoNombre = null) => {
+    if (subCampoNombre) {
+      setFormData((prev) => ({
+        ...prev,
+        [campoNombre]: {
+          ...prev[campoNombre],
+          [subCampoNombre]: value,
+        },
+      }))
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [campoNombre]: value,
+      }))
+    }
   }
 
-  // Enviar datos al servidor
   const handleGuardar = async () => {
     try {
       const res = await fetch(import.meta.env.VITE_API_URL + '/api/panel-info', {
@@ -74,14 +78,23 @@ const PanelActualizacion = () => {
     }
   }
 
-  // Cancelar (restaurar valores iniciales)
   const handleCancelar = () => {
+    if (!panelInfoWeb) return
     const resetData = {}
     panelInfoWeb.campos.forEach((campo) => {
-      resetData[campo.label] = campo.valor || ''
+      if (campo.tipo === 'lista' && Array.isArray(campo.campos)) {
+        resetData[campo.nombre] = {}
+        campo.campos.forEach((sub) => {
+          resetData[campo.nombre][sub.nombre] = sub.valor ?? ''
+        })
+      } else {
+        resetData[campo.nombre] = campo.valor ?? ''
+      }
     })
     setFormData(resetData)
   }
+
+  if (!panelInfoWeb) return <p>Cargando datos...</p>
 
   return (
     <CContainer className="py-4">
@@ -93,22 +106,49 @@ const PanelActualizacion = () => {
           <CForm>
             {panelInfoWeb.campos.map((campo, idx) => {
               if (campo.tipo === 'lista') {
-                return <ListaCampos lista={campo} key={idx} />;
+                return (
+                  <div key={idx} className="mb-4">
+                    <h5>{campo.nombre}</h5>
+                    {campo.descripcion && <p>{campo.descripcion}</p>}
+                    {campo.campos.map((sub, subIdx) => (
+                      <div key={subIdx} className="mb-2">
+                        <CFormLabel>{sub.nombre}</CFormLabel>
+                        <CFormInput
+                          type={sub.tipo === 'fecha' ? 'date' : 'text'}
+                          value={formData?.[campo.nombre]?.[sub.nombre] || ''}
+                          onChange={(e) => handleChange(campo.nombre, e.target.value, sub.nombre)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )
               }
-              // Aquí un ejemplo básico con CFormLabel y CFormInput
+
               return (
-                <div className="mb-3" key={idx}>
-                  <CFormLabel htmlFor={`campo-${idx}`}>{campo.label}</CFormLabel>
-                  <CFormInput
-                    id={`campo-${idx}`}
-                    type="text"
-                    defaultValue={campo.valor || ''}
-                    placeholder={campo.placeholder || ''}
-                  />
+                <div key={idx} className="mb-3">
+                  <CFormLabel>{campo.nombre}</CFormLabel>
+                  {campo.tipo === 'texto_largo' ? (
+                    <CFormTextarea
+                      value={formData?.[campo.nombre] || ''}
+                      onChange={(e) => handleChange(campo.nombre, e.target.value)}
+                    />
+                  ) : campo.tipo === 'fecha' ? (
+                    <CFormInput
+                      type="date"
+                      value={formData?.[campo.nombre] || ''}
+                      onChange={(e) => handleChange(campo.nombre, e.target.value)}
+                    />
+                  ) : (
+                    <CFormInput
+                      type="text"
+                      value={formData?.[campo.nombre] || ''}
+                      onChange={(e) => handleChange(campo.nombre, e.target.value)}
+                    />
+                  )}
                 </div>
-              );
+              )
             })}
-             <div className="d-flex gap-2">
+            <div className="d-flex gap-2 mt-4">
               <CButton color="primary" onClick={handleGuardar}>
                 Guardar
               </CButton>
@@ -120,7 +160,7 @@ const PanelActualizacion = () => {
         </CCardBody>
       </CCard>
     </CContainer>
-  );
-};
+  )
+}
 
-export default PanelActualizacion;
+export default PanelActualizacion
