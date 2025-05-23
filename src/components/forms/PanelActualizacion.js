@@ -23,23 +23,31 @@ const PanelActualizacion = () => {
   // Simula un fetch para traer los datos iniciales
   useEffect(() => {
     const fetchData = async () => {
-      // Simula URL y fetch
-      const response = await fetch('/api/panel-info')
-      const data = await response.json()
-      setPanelInfoWeb(data)
+      try {
+        const response = await fetch(import.meta.env.VITE_API_URL + '/api/panel-info')
+        if (!response.ok) throw new Error('Error al cargar datos')
+        const data = await response.json()
+        setPanelInfoWeb(data)
 
-      // Inicializa formData con valores recibidos
-      const initialData = {}
-      data.campos.forEach((campo) => {
-        initialData[campo.label] = campo.valor || ''
-      })
-      setFormData(initialData)
+        // Inicializa formData con valores recibidos
+        const initialData = {}
+        data.campos.forEach((campo) => {
+          initialData[campo.label] = campo.valor || ''
+        })
+        setFormData(initialData)
+      } catch (error) {
+        console.error('Fetch error:', error)
+        // En caso de error, podrías inicializar con un objeto vacío o datos por defecto
+        setPanelInfoWeb({ campos: [] })
+        setFormData({})
+      }
     }
 
     fetchData()
   }, [])
 
-  if (!panelInfoWeb) return setPanelInfoWeb(panelData.panel)
+  // Si no hay panelInfoWeb, mostrar algo (spinner, mensaje, etc.)
+  if (!panelInfoWeb) return <p>Cargando datos...</p>
 
   // Maneja cambios de inputs
   const handleChange = (label, value) => {
@@ -52,7 +60,7 @@ const PanelActualizacion = () => {
   // Enviar datos al servidor
   const handleGuardar = async () => {
     try {
-      const res = await fetch('/api/panel-info', {
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/panel-info', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

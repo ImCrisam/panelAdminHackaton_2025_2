@@ -1,8 +1,6 @@
 import React from 'react'
 
-const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
-const PanelActualizacion = React.lazy(() => import('./components/forms/PanelActualizacion'))
-const PanelDisponibilidad = React.lazy(() => import('./components/salones/PanelDisponibilidad .js'))
+
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
 
@@ -53,6 +51,10 @@ const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
 
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
+
+const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
+const PanelActualizacion = React.lazy(() => import('./components/forms/PanelActualizacion'))
+const PanelDisponibilidad = React.lazy(() => import('./components/Disponibilidad/PanelDisponibilidad .js'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
