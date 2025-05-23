@@ -53,7 +53,7 @@ const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
-const PanelActualizacion = React.lazy(() => import('./components/forms/PanelActualizacion'))
+const PanelActualizacion = React.lazy(() => import('./components/forms/PanelActualizacion.js'))
 const PanelDisponibilidad = React.lazy(() => import('./components/Disponibilidad/PanelDisponibilidad .js'))
 
 const routes = [
